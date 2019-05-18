@@ -16,6 +16,8 @@ Future configureServer(Angel app) async {
   final droidService = mountService<Droid>(app, '/api/droids');
   final humansService = mountService<Human>(app, '/api/humans');
   final starshipService = mountService<Starship>(app, '/api/starships');
+  final reviewService = mountService<Review>(app, '/api/starships');
+
   final rnd = Random();
 
   // A Hero can be either a Droid or Human; create a union type that represents this.
@@ -58,28 +60,65 @@ Future configureServer(Angel app) async {
         ],
         resolve: randomHeroResolver(droidService, humansService, rnd),
       ),
+      field(
+        'reviews',
+        listOf(reviewGraphQLType.nonNullable()),
+        description: 'All movie reviews.',
+        resolve: resolveViaServiceIndex(reviewService),
+      ),
     ],
   );
 
   // Convert our object types to input objects, so that they can be passed to
   // mutations.
-  var humanChangesType = humanGraphQLType.toInputObject('HumanChanges');
+  final humanInputType = humanGraphQLType.toInputObject('HumanInput');
+
+  final reviewInputType = reviewGraphQLType.toInputObject('ReviewInput');
 
   // Create the mutation type.
   var mutationType = objectType(
     'StarWarsMutation',
     fields: [
-      // We'll use the `modifyHuman` mutation to modify a human in the database.
       field(
-        'modifyHuman',
+        'updateHuman',
         humanGraphQLType.nonNullable(),
-        description: 'Modifies a human in the database.',
+        description: 'Updates a human in the database.',
         inputs: [
           GraphQLFieldInput('id', graphQLId.nonNullable()),
-          GraphQLFieldInput('data', humanChangesType.nonNullable()),
+          GraphQLFieldInput('data', humanInputType.nonNullable()),
         ],
-        resolve: resolveViaServiceModify(humansService),
+        resolve: resolveViaServiceUpdate(humansService),
       ),
+      field(
+        'deleteHuman',
+        humanGraphQLType.nonNullable(),
+        description: 'Delete a human in the database.',
+        inputs: [
+          GraphQLFieldInput('id', graphQLId.nonNullable()),
+        ],
+        resolve: resolveViaServiceRemove(humansService),
+      ),
+      // We'll use the `modifyHuman` mutation to modify a human in the database.
+      field(
+        'createReview',
+        reviewGraphQLType.nonNullable(),
+        description: 'Creates a review',
+        inputs: [
+          GraphQLFieldInput('data', reviewInputType.nonNullable()),
+        ],
+        resolve: resolveViaServiceCreate(reviewService),
+      ),
+    ],
+  );
+
+  var reviewAdded = reviewService.afterCreated
+      .asStream()
+      .map((e) => {'reviewAdded': e.result})
+      .asBroadcastStream();
+  final subscriptionType = objectType(
+    'Subscription',
+    fields: [
+      field('reviewAdded', reviewGraphQLType, resolve: (_, __) => reviewAdded),
     ],
   );
 
@@ -87,6 +126,7 @@ Future configureServer(Angel app) async {
   var schema = graphQLSchema(
     queryType: queryType,
     mutationType: mutationType,
+    subscriptionType: subscriptionType,
   );
 
   // Next, create a GraphQL object, which will be passed to `graphQLHttp`, and
@@ -96,9 +136,21 @@ Future configureServer(Angel app) async {
   // Mount the GraphQL endpoint.
   app.all('/graphql', graphQLHttp(graphQL));
 
+  app.get(
+    '/subscriptions',
+    graphQLWS(
+      GraphQL(schema),
+      keepAliveInterval: Duration(seconds: 3),
+    ),
+  );
+
   // In development, we'll want to mount GraphiQL, for easy management of the database.
   if (!app.environment.isProduction) {
-    app.get('/graphiql', graphiQL());
+    app.get(
+        '/graphiql',
+        graphiQL(
+          subscriptionsEndpoint: 'ws://localhost:3000/subscriptions',
+        ));
   }
 
   // TODO replace MapService with a relational cache from graphql/client
@@ -153,5 +205,15 @@ GraphQLFieldResolver randomHeroResolver(
   };
 }
 
-Service mountService<T extends Model>(Angel app, String path) =>
-    app.use(path, TypedService(MapService(autoIdAndDateFields: false)));
+// TODO can't use proper typing
+HookedService mountService<T extends Model>(
+  Angel app,
+  String path,
+) {
+  final service = TypedService(MapService(
+    autoIdAndDateFields: false,
+    autoSnakeCaseNames: false,
+  ));
+  final hooked = app.use(path, service);
+  return hooked;
+}

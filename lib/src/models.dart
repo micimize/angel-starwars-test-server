@@ -2,9 +2,10 @@ import 'package:angel_model/angel_model.dart';
 import 'package:angel_serialize/angel_serialize.dart';
 import 'package:graphql_schema/graphql_schema.dart';
 
+// part 'models.g.dart';
 part 'models_g.dart';
 
-// @graphQLClass
+@graphQLClass
 @GraphQLDocumentation(description: 'The episodes in the Star Wars trilogy')
 enum Episode {
   NEWHOPE,
@@ -244,6 +245,36 @@ abstract class _Human extends Model implements Character {
 
       # A list of starships this person has piloted, or an empty list if none
       starships: [Starship]
+    }
+  """;
+}
+
+@serializable
+@graphQLClass
+abstract class _Review extends Model {
+  @GraphQLDocumentation(description: "The movie")
+  @SerializableField(isNullable: false)
+  Episode episode;
+
+  @GraphQLDocumentation(
+      description: "The number of stars this review gave, 1-5")
+  @SerializableField(isNullable: false)
+  int stars;
+
+  @GraphQLDocumentation(description: "Comment about the movie")
+  String commentary;
+
+  final graphql = """
+    # Represents a review for a movie
+    type Review {
+      # The movie
+      episode: Episode
+
+      # The number of stars this review gave, 1-5
+      stars: Int!
+
+      # Comment about the movie
+      commentary: String
     }
   """;
 }

@@ -627,6 +627,179 @@ abstract class HumanFields {
   static const String updatedAt = 'updated_at';
 }
 
+@generatedSerializable
+class Review extends _Review {
+  Review(
+      {this.id,
+      @required this.episode,
+      @required this.stars,
+      this.commentary,
+      this.createdAt,
+      this.updatedAt});
+
+  @override
+  final String id;
+
+  @override
+  final Episode episode;
+
+  @override
+  final int stars;
+
+  @override
+  final String commentary;
+
+  @override
+  final DateTime createdAt;
+
+  @override
+  final DateTime updatedAt;
+
+  Review copyWith(
+      {String id,
+      Episode episode,
+      int stars,
+      String commentary,
+      DateTime createdAt,
+      DateTime updatedAt}) {
+    return Review(
+        id: id ?? this.id,
+        episode: episode ?? this.episode,
+        stars: stars ?? this.stars,
+        commentary: commentary ?? this.commentary,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt);
+  }
+
+  bool operator ==(other) {
+    return other is _Review &&
+        other.id == id &&
+        other.episode == episode &&
+        other.stars == stars &&
+        other.commentary == commentary &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt;
+  }
+
+  @override
+  int get hashCode {
+    return hashObjects([id, episode, stars, commentary, createdAt, updatedAt]);
+  }
+
+  @override
+  String toString() {
+    return "Review(id=$id, episode=$episode, stars=$stars, commentary=$commentary, createdAt=$createdAt, updatedAt=$updatedAt)";
+  }
+
+  Map<String, dynamic> toJson() {
+    return ReviewSerializer.toMap(this);
+  }
+}
+
+// **************************************************************************
+// SerializerGenerator
+// **************************************************************************
+
+const ReviewSerializer reviewSerializer = ReviewSerializer();
+
+class ReviewEncoder extends Converter<Review, Map> {
+  const ReviewEncoder();
+
+  @override
+  Map convert(Review model) => ReviewSerializer.toMap(model);
+}
+
+class ReviewDecoder extends Converter<Map, Review> {
+  const ReviewDecoder();
+
+  @override
+  Review convert(Map map) => ReviewSerializer.fromMap(map);
+}
+
+class ReviewSerializer extends Codec<Review, Map> {
+  const ReviewSerializer();
+
+  @override
+  get encoder => const ReviewEncoder();
+  @override
+  get decoder => const ReviewDecoder();
+  static Review fromMap(Map map) {
+    if (map['episode'] == null) {
+      throw FormatException("Missing required field 'episode' on Review.");
+    }
+
+    if (map['stars'] == null) {
+      throw FormatException("Missing required field 'stars' on Review.");
+    }
+
+    return Review(
+        id: map['id'] as String,
+        episode: map['episode'] is Episode
+            ? (map['episode'] as Episode)
+            : (map['episode'] is int
+                ? Episode.values[map['episode'] as int]
+                : null),
+        stars: map['stars'] as int,
+        commentary: map['commentary'] as String,
+        createdAt: map['created_at'] != null
+            ? (map['created_at'] is DateTime
+                ? (map['created_at'] as DateTime)
+                : DateTime.parse(map['created_at'].toString()))
+            : null,
+        updatedAt: map['updated_at'] != null
+            ? (map['updated_at'] is DateTime
+                ? (map['updated_at'] as DateTime)
+                : DateTime.parse(map['updated_at'].toString()))
+            : null);
+  }
+
+  static Map<String, dynamic> toMap(_Review model) {
+    if (model == null) {
+      return null;
+    }
+    if (model.episode == null) {
+      throw FormatException("Missing required field 'episode' on Review.");
+    }
+
+    if (model.stars == null) {
+      throw FormatException("Missing required field 'stars' on Review.");
+    }
+
+    return {
+      'id': model.id,
+      'episode':
+          model.episode == null ? null : Episode.values.indexOf(model.episode),
+      'stars': model.stars,
+      'commentary': model.commentary,
+      'created_at': model.createdAt?.toIso8601String(),
+      'updated_at': model.updatedAt?.toIso8601String()
+    };
+  }
+}
+
+abstract class ReviewFields {
+  static const List<String> allFields = <String>[
+    id,
+    episode,
+    stars,
+    commentary,
+    createdAt,
+    updatedAt
+  ];
+
+  static const String id = 'id';
+
+  static const String episode = 'episode';
+
+  static const String stars = 'stars';
+
+  static const String commentary = 'commentary';
+
+  static const String createdAt = 'created_at';
+
+  static const String updatedAt = 'updated_at';
+}
+
 // **************************************************************************
 // _GraphQLGenerator
 // **************************************************************************
@@ -678,6 +851,19 @@ final GraphQLObjectType humanGraphQLType =
   field('mass', graphQLFloat),
   field('friends', listOf(characterGraphQLType)),
   field('starships', listOf(starshipGraphQLType)),
+  field('created_at', graphQLDate),
+  field('updated_at', graphQLDate),
+  field('graphql', graphQLString),
+  field('idAsInt', graphQLInt)
+]);
+
+/// Auto-generated from [Review].
+final GraphQLObjectType reviewGraphQLType =
+    objectType('Review', isInterface: false, interfaces: [], fields: [
+  field('id', graphQLString),
+  field('episode', episodeGraphQLType),
+  field('stars', graphQLInt),
+  field('commentary', graphQLString),
   field('created_at', graphQLDate),
   field('updated_at', graphQLDate),
   field('graphql', graphQLString),
