@@ -6,9 +6,8 @@ import 'package:angel_graphql/angel_graphql.dart';
 import 'package:graphql_schema/graphql_schema.dart';
 import 'package:graphql_server/graphql_server.dart';
 import 'package:angel_typed_service/angel_typed_service.dart';
-import 'package:graphql_server/mirrors.dart';
 
-import 'src/models/models.dart';
+import 'src/models.dart';
 import 'src/data.dart';
 
 Future configureServer(Angel app) async {
@@ -19,15 +18,9 @@ Future configureServer(Angel app) async {
   final starshipService = mountService<Starship>(app, '/api/starships');
   final rnd = Random();
 
-  // Create the GraphQL schema.
-  // This code uses dart:mirrors to easily create GraphQL types from Dart PODO's.
-  final starshipType = convertDartType(Starship);
-  final episodeType = convertDartType(Episode);
-  final droidType = convertDartClass(Droid);
-  final humanType = convertDartClass(Human);
-
   // A Hero can be either a Droid or Human; create a union type that represents this.
-  final heroType = GraphQLUnionType('Hero', [droidType, humanType]);
+  final heroType =
+      GraphQLUnionType('Hero', [droidGraphQLType, humanGraphQLType]);
 
   // Create the query type.
   //
@@ -39,19 +32,19 @@ Future configureServer(Angel app) async {
     fields: [
       field(
         'droids',
-        listOf(droidType.nonNullable()),
+        listOf(droidGraphQLType.nonNullable()),
         description: 'All droids in the known galaxy.',
         resolve: resolveViaServiceIndex(droidService),
       ),
       field(
         'humans',
-        listOf(humanType.nonNullable()),
+        listOf(humanGraphQLType.nonNullable()),
         description: 'All humans in the known galaxy.',
         resolve: resolveViaServiceIndex(humansService),
       ),
       field(
         'starships',
-        listOf(starshipType.nonNullable()),
+        listOf(starshipGraphQLType.nonNullable()),
         description: 'All starships in the known galaxy.',
         resolve: resolveViaServiceIndex(starshipService),
       ),
@@ -61,7 +54,7 @@ Future configureServer(Angel app) async {
         description:
             'Finds a random hero within the known galaxy, whether a Droid or Human.',
         inputs: [
-          GraphQLFieldInput('ep', episodeType),
+          GraphQLFieldInput('ep', episodeGraphQLType),
         ],
         resolve: randomHeroResolver(droidService, humansService, rnd),
       ),
@@ -70,16 +63,16 @@ Future configureServer(Angel app) async {
 
   // Convert our object types to input objects, so that they can be passed to
   // mutations.
-  var humanChangesType = humanType.toInputObject('HumanChanges');
+  var humanChangesType = humanGraphQLType.toInputObject('HumanChanges');
 
   // Create the mutation type.
   var mutationType = objectType(
     'StarWarsMutation',
     fields: [
-      // We'll use the `modify_human` mutation to modify a human in the database.
+      // We'll use the `modifyHuman` mutation to modify a human in the database.
       field(
-        'modify_human',
-        humanType.nonNullable(),
+        'modifyHuman',
+        humanGraphQLType.nonNullable(),
         description: 'Modifies a human in the database.',
         inputs: [
           GraphQLFieldInput('id', graphQLId.nonNullable()),
@@ -108,15 +101,35 @@ Future configureServer(Angel app) async {
     app.get('/graphiql', graphiQL());
   }
 
+  // TODO replace MapService with a relational cache from graphql/client
+  // we're inlining relations here for now
+
+  Map<String, dynamic> starshipMap = {};
+  Map<String, dynamic> friendMap = {};
+
+  for (final friend in [...data['humans'], ...data['droids']]) {
+    friendMap[friend['id'] as String] = friend;
+  }
+
   for (final starship in data['starships']) {
+    starshipMap[starship['id'] as String] = starship;
     await starshipService.create(starship);
   }
 
+  List<dynamic> denormalize(dynamic ids, Map<String, dynamic> relation) =>
+      ((ids ?? const []) as List)
+          .cast<String>()
+          .map((String id) => relation[id])
+          .toList();
+
   for (final human in data['humans']) {
+    human['friends'] = denormalize(human['friends'], friendMap);
+    human['starships'] = denormalize(human['starships'], starshipMap);
     await humansService.create(human);
   }
 
   for (final droid in data['droids']) {
+    droid['friends'] = denormalize(droid['friends'], friendMap);
     await droidService.create(droid);
   }
 }
@@ -141,4 +154,4 @@ GraphQLFieldResolver randomHeroResolver(
 }
 
 Service mountService<T extends Model>(Angel app, String path) =>
-    app.use(path, TypedService(MapService()));
+    app.use(path, TypedService(MapService(autoIdAndDateFields: false)));
