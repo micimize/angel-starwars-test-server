@@ -1,10 +1,14 @@
-name: star_wars
-publish_to: none
+name: graphql_starwars_test_server
+description: A stand-alone GraphQL test server built with angel dart.
+  Adapted from [example_star_wars](https://github.com/angel-dart/graphql/tree/master/example_star_wars)
+version: 0.0.1-beta
+author: Michael Joseph Rosenthal <rosenthalm93@gmail.com>
+homepage: https://github.com/micimize//angel-starwars-test-server
 dependencies:
   #angel_file_service: ^1.0.0
+  args: 1.5.1
   angel_graphql: ^1.0.0
   angel_framework: ^2.0.1
-  angel_hot: ^2.0.6
   angel_typed_service: ^1.0.1
   angel_model: ^1.0.0
   angel_serialize: ^2.0.0
@@ -14,3 +18,7 @@ dev_dependencies:
   angel_serialize_generator: ^2.0.0
   graphql_generator: ^1.0.0
   build_runner: ^1.0.0
+environment:
+  sdk: '>=2.3.0 <3.0.0'
+executables:
+  serve: bin/server.dart
