@@ -25,4 +25,4 @@ dev_dependencies:
 environment:
   sdk: '>=2.2.0 <3.0.0'
 executables:
-  serve: graphql_starwars_test_server.dart
+  serve: graphql_starwars_test_server
