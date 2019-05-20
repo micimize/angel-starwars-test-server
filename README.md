@@ -15,3 +15,11 @@ mutation {
   }
 }
 ```
+
+```gql
+subscription {
+  reviewAdded {
+    stars, commentary, episode
+  }
+}
+```

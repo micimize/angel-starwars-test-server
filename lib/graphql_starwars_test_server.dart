@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:async/async.dart' show StreamGroup;
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_graphql/angel_graphql.dart';
 import 'package:graphql_schema/graphql_schema.dart';
@@ -10,13 +11,22 @@ import 'package:angel_typed_service/angel_typed_service.dart';
 import 'src/models.dart';
 import 'src/data.dart';
 
-Future configureServer(Angel app) async {
+import 'review_generator.dart';
+
+Future configureServer(
+  Angel app,
+) async {
+  bool generateReviews = bool.fromEnvironment(
+    'GENERATE_REVIEWS',
+    defaultValue: true,
+  );
   // Create standard Angel services. Note that these will also *automatically* be
   // exposed via a REST API as well.
   final droidService = mountService<Droid>(app, '/api/droids');
   final humansService = mountService<Human>(app, '/api/humans');
   final starshipService = mountService<Starship>(app, '/api/starships');
-  final reviewService = mountService<Review>(app, '/api/starships');
+  final reviewService =
+      mountService<Review>(app, '/api/starships', managed: true);
 
   final rnd = Random();
 
@@ -111,14 +121,22 @@ Future configureServer(Angel app) async {
     ],
   );
 
-  var reviewAdded = reviewService.afterCreated
-      .asStream()
-      .map((e) => {'reviewAdded': e.result})
+  final reviewAdded =
+      reviewService.afterCreated.asStream().map((e) => e.result);
+
+  final reviewStream = (generateReviews
+          ? StreamGroup.merge([
+              randomReviewStream().map((r) => r.toJson()),
+              reviewAdded,
+            ])
+          : reviewAdded)
+      .map((reviewJson) => {'reviewAdded': reviewJson as Map<String, dynamic>})
       .asBroadcastStream();
+
   final subscriptionType = objectType(
     'Subscription',
     fields: [
-      field('reviewAdded', reviewGraphQLType, resolve: (_, __) => reviewAdded),
+      field('reviewAdded', reviewGraphQLType, resolve: (_, __) => reviewStream),
     ],
   );
 
@@ -208,10 +226,11 @@ GraphQLFieldResolver randomHeroResolver(
 // TODO can't use proper typing
 HookedService mountService<T extends Model>(
   Angel app,
-  String path,
-) {
+  String path, {
+  bool managed = false,
+}) {
   final service = TypedService(MapService(
-    autoIdAndDateFields: false,
+    autoIdAndDateFields: managed,
     autoSnakeCaseNames: false,
   ));
   final hooked = app.use(path, service);

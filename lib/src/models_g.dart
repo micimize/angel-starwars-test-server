@@ -737,7 +737,7 @@ class ReviewSerializer extends Codec<Review, Map> {
         episode: map['episode'] is Episode
             ? (map['episode'] as Episode)
             : (map['episode'] is int
-                ? Episode.values[map['episode'] as int]
+                ? episodeFromJson(map['episode'] as String)
                 : null),
         stars: map['stars'] as int,
         commentary: map['commentary'] as String,
@@ -767,8 +767,7 @@ class ReviewSerializer extends Codec<Review, Map> {
 
     return {
       'id': model.id,
-      'episode':
-          model.episode == null ? null : Episode.values.indexOf(model.episode),
+      'episode': model.episode == null ? null : episodeToJson(model.episode),
       'stars': model.stars,
       'commentary': model.commentary,
       'created_at': model.createdAt?.toIso8601String(),
@@ -869,3 +868,29 @@ final GraphQLObjectType reviewGraphQLType =
   field('graphql', graphQLString),
   field('idAsInt', graphQLInt)
 ]);
+
+String episodeToJson(Episode e) {
+  switch (e) {
+    case Episode.NEWHOPE:
+      return 'NEWHOPE';
+    case Episode.EMPIRE:
+      return 'EMPIRE';
+    case Episode.JEDI:
+      return 'JEDI';
+    default:
+      return null;
+  }
+}
+
+Episode episodeFromJson(String e) {
+  switch (e) {
+    case 'NEWHOPE':
+      return Episode.NEWHOPE;
+    case 'EMPIRE':
+      return Episode.EMPIRE;
+    case 'JEDI':
+      return Episode.JEDI;
+    default:
+      return null;
+  }
+}

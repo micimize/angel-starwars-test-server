@@ -7,7 +7,8 @@ import 'package:args/args.dart';
 
 import 'package:graphql_starwars_test_server/src/pretty_logging.dart'
     show prettyLog;
-import 'package:graphql_starwars_test_server/graphql_starwars_test_server.dart' as star_wars;
+import 'package:graphql_starwars_test_server/graphql_starwars_test_server.dart'
+    as star_wars;
 
 final parser = ArgParser()
   ..addOption('host', defaultsTo: '127.0.0.1')
@@ -21,7 +22,9 @@ main(List<String> args) async {
   Future<Angel> createServer() async {
     Angel app = Angel();
     app.logger = Logger('star_wars')..onRecord.listen(prettyLog);
-    await app.configure(star_wars.configureServer);
+    await app.configure(
+      star_wars.configureServer,
+    );
     return app;
   }
 
