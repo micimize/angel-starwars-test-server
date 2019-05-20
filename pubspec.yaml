@@ -6,8 +6,11 @@ author: Michael Joseph Rosenthal <rosenthalm93@gmail.com>
 homepage: https://github.com/micimize//angel-starwars-test-server
 dependencies:
   #angel_file_service: ^1.0.0
+  async: ^2.2.0
   args: ^1.5.1
   angel_graphql: ^1.0.0
+  graphql_schema: ^1.0.4
+  graphql_server: ^1.0.0
   angel_framework: ^2.0.1
   angel_typed_service: ^1.0.1
   angel_http_exception: ^1.0.1
