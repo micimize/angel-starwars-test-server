@@ -149,7 +149,7 @@ Future configureServer(
 
   // Next, create a GraphQL object, which will be passed to `graphQLHttp`, and
   // used to mount a spec-compliant GraphQL endpoint on the server.
-  var graphQL = GraphQL(schema);
+  var graphQL = GraphQL(schema, introspect: false);
 
   // Mount the GraphQL endpoint.
   app.all('/graphql', graphQLHttp(graphQL));
@@ -157,7 +157,7 @@ Future configureServer(
   app.get(
     '/subscriptions',
     graphQLWS(
-      GraphQL(schema),
+      graphQL,
       keepAliveInterval: Duration(seconds: 3),
     ),
   );

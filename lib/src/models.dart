@@ -105,11 +105,70 @@ abstract class Character {
   """;
 }
 
-GraphQLObjectType _characterType(GraphQLType self) => objectType(
-      'Character',
-      isInterface: true,
-      interfaces: [],
-      fields: [
+typedef GetFields = Iterable<GraphQLObjectField> Function(
+    SelfRefObjectType self);
+
+typedef GetInputFields = Iterable<GraphQLInputObjectField> Function(
+  SelfRefObjectType source,
+  SelfRefInputObjectType self,
+);
+
+class SelfRefInputObjectType extends GraphQLInputObjectType {
+  SelfRefInputObjectType(
+    String name, {
+    String description,
+    @required SelfRefObjectType source,
+    GetInputFields getInputFields,
+  }) : super(name, description: description) {
+    inputFields.addAll(getInputFields(source, this) ?? []);
+  }
+}
+
+class SelfRefObjectType extends GraphQLObjectType {
+  SelfRefObjectType(
+    String name, {
+    String description,
+    bool isInterface: false,
+    GetFields getFields,
+    Iterable<GraphQLObjectType> interfaces = const [],
+  }) : super(name, description, isInterface: isInterface) {
+    fields.addAll(getFields(this) ?? []);
+    if (interfaces?.isNotEmpty == true) {
+      for (var i in interfaces) {
+        inheritFrom(i);
+      }
+    }
+  }
+
+  GraphQLInputObjectType toInputObject(String name, {String description}) {
+    return SelfRefInputObjectType(
+      name,
+      description: description ?? this.description,
+      source: this,
+      getInputFields: (source, self) => fields.map((f) {
+            return f.type == source
+                ? self as GraphQLInputObjectField
+                : f.type is GraphQLListType &&
+                        (f.type as GraphQLListType).ofType == source
+                    ? GraphQLInputObjectField(
+                        f.name,
+                        GraphQLListType(self),
+                      )
+                    : GraphQLInputObjectField(
+                        f.name,
+                        f.type.coerceToInputObject(),
+                        description: f.description,
+                      );
+          }),
+    );
+  }
+}
+
+GraphQLObjectType characterGraphQLType = SelfRefObjectType(
+  'Character',
+  isInterface: true,
+  interfaces: [],
+  getFields: (self) => [
         field('id', graphQLString, description: 'The ID of the character'),
         field('name', graphQLString, description: 'The name of the character'),
         field('friends', listOf(self),
@@ -122,11 +181,7 @@ GraphQLObjectType _characterType(GraphQLType self) => objectType(
         ),
         field('graphql', graphQLString)
       ],
-    );
-
-GraphQLObjectType _characterLeafGraphQLType = _characterType(graphQLString);
-GraphQLObjectType characterGraphQLType =
-    _characterType(_characterLeafGraphQLType);
+);
 
 // @serializable
 // @graphQLClass
