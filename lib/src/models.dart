@@ -112,12 +112,12 @@ GraphQLObjectType _characterType(GraphQLType self) => objectType(
       fields: [
         field('id', graphQLString, description: 'The ID of the character'),
         field('name', graphQLString, description: 'The name of the character'),
-        field('friends', listOf(graphQLString),
+        field('friends', listOf(self),
             description:
                 'The friends of the character, or an empty list if they have none'),
         field(
           'appearsIn',
-          listOf(self),
+          listOf(episodeGraphQLType),
           description: 'The movies this character appears in',
         ),
         field('graphql', graphQLString)
