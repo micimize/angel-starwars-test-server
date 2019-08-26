@@ -71,11 +71,37 @@ Future configureServer(
         resolve: randomHeroResolver(droidService, humansService, rnd),
       ),
       field(
-        'reviews',
-        listOf(reviewGraphQLType.nonNullable()),
-        description: 'All movie reviews.',
-        resolve: resolveViaServiceIndex(reviewService),
-      ),
+          'reviews',
+          objectType(
+            'ReviewResults',
+            description:
+                'Paginating movie review api. Returns { reviews, page }',
+            fields: [
+              field(
+                'page',
+                graphQLInt,
+                description: 'The page index',
+              ),
+              field(
+                'reviews',
+                listOf(reviewGraphQLType.nonNullable()),
+                description: 'The list of reviews',
+              ),
+            ],
+          ),
+          inputs: [
+            GraphQLFieldInput(
+              'page',
+              graphQLInt,
+              defaultValue: 0,
+              description: 'which page to get from the api',
+            )
+          ], resolve: (_, inputs) {
+        return {
+          'page': inputs['page'],
+          'reviews': directory.pageAsJson(inputs['page'] as int),
+        };
+      }),
     ],
   );
 
