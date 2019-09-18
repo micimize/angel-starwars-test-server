@@ -5,8 +5,8 @@ import 'package:graphql_schema/graphql_schema.dart';
 // part 'models.g.dart';
 part 'models_g.dart';
 
-@graphQLClass
 @GraphQLDocumentation(description: 'The episodes in the Star Wars trilogy')
+@graphQLClass
 enum Episode {
   NEWHOPE,
   EMPIRE,

@@ -71,37 +71,38 @@ Future configureServer(
         resolve: randomHeroResolver(droidService, humansService, rnd),
       ),
       field(
-          'reviews',
-          objectType(
-            'ReviewResults',
-            description:
-                'Paginating movie review api. Returns { reviews, page }',
-            fields: [
-              field(
-                'page',
-                graphQLInt,
-                description: 'The page index',
-              ),
-              field(
-                'reviews',
-                listOf(reviewGraphQLType.nonNullable()),
-                description: 'The list of reviews',
-              ),
-            ],
-          ),
-          inputs: [
-            GraphQLFieldInput(
+        'reviews',
+        objectType(
+          'ReviewResults',
+          description: 'Paginating movie review api. Returns { reviews, page }',
+          fields: [
+            field(
               'page',
               graphQLInt,
-              defaultValue: 0,
-              description: 'which page to get from the api',
-            )
-          ], resolve: (_, inputs) {
-        return {
-          'page': inputs['page'],
-          'reviews': directory.pageAsJson(inputs['page'] as int),
-        };
-      }),
+              description: 'The page index',
+            ),
+            field(
+              'reviews',
+              listOf(reviewGraphQLType.nonNullable()),
+              description: 'The list of reviews',
+            ),
+          ],
+        ),
+        inputs: [
+          GraphQLFieldInput(
+            'page',
+            graphQLInt,
+            defaultValue: 0,
+            description: 'which page to get from the api',
+          )
+        ],
+        resolve: (_, inputs) {
+          return {
+            'page': inputs['page'],
+            'reviews': directory.pageAsJson(inputs['page'] as int),
+          };
+        },
+      ),
     ],
   );
 
@@ -175,7 +176,17 @@ Future configureServer(
 
   // Next, create a GraphQL object, which will be passed to `graphQLHttp`, and
   // used to mount a spec-compliant GraphQL endpoint on the server.
-  var graphQL = GraphQL(schema, introspect: false);
+  var graphQL = GraphQL(
+    schema,
+    introspect: false,
+    customTypes: [
+      episodeGraphQLType,
+      starshipGraphQLType,
+      droidGraphQLType,
+      humanGraphQLType,
+      reviewGraphQLType,
+    ],
+  );
 
   // Mount the GraphQL endpoint.
   app.all('/graphql', graphQLHttp(graphQL));
