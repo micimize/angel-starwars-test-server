@@ -5,6 +5,7 @@ import 'package:angel_framework/angel_framework.dart';
 import 'package:logging/logging.dart';
 import 'package:args/args.dart';
 
+import 'package:angel_container/mirrors.dart';
 import 'package:graphql_starwars_test_server/src/pretty_logging.dart'
     show prettyLog;
 import 'package:graphql_starwars_test_server/graphql_starwars_test_server.dart'
@@ -20,7 +21,7 @@ main(List<String> args) async {
   final port = int.parse(arguments['port'] as String);
 
   Future<Angel> createServer() async {
-    Angel app = Angel();
+    Angel app = Angel(reflector: MirrorsReflector());
     app.logger = Logger('star_wars')..onRecord.listen(prettyLog);
     await app.configure(
       star_wars.configureServer,
