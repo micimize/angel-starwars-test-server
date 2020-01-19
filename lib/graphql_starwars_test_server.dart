@@ -6,6 +6,7 @@ import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_graphql/angel_graphql.dart';
 import 'package:graphql_schema/graphql_schema.dart';
 import 'package:graphql_server/graphql_server.dart';
+import 'package:graphql_server/mirrors.dart';
 import 'package:angel_typed_service/angel_typed_service.dart';
 
 import 'src/models.dart';
@@ -178,7 +179,7 @@ Future configureServer(
   // used to mount a spec-compliant GraphQL endpoint on the server.
   var graphQL = GraphQL(
     schema,
-    introspect: false,
+    introspect: true,
     customTypes: [
       episodeGraphQLType,
       starshipGraphQLType,
@@ -186,6 +187,7 @@ Future configureServer(
       humanGraphQLType,
       reviewGraphQLType,
     ],
+    defaultFieldResolver: mirrorsFieldResolver
   );
 
   // Mount the GraphQL endpoint.

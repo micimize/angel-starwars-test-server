@@ -27,6 +27,13 @@ dev_dependencies:
   graphql_generator: ^1.0.0
   build_runner: ^1.0.0
 
+dependency_overrides:
+  graphql_server: 
+    git:
+      url: git://github.com/micimize/graphql.git
+      ref: introspective-cycles
+      path: graphql_server
+
 environment:
   sdk: '>=2.2.0 <3.0.0'
 
