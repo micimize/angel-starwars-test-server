@@ -1,9 +1,9 @@
 name: graphql_starwars_test_server
 description: A stand-alone GraphQL test server built with angel dart.
   Adapted from [example_star_wars](https://github.com/angel-dart/graphql/tree/master/example_star_wars)
-version: 0.0.4
+version: 0.0.5
 author: Michael Joseph Rosenthal <rosenthalm93@gmail.com>
-homepage: https://github.com/micimize//angel-starwars-test-server
+homepage: https://github.com/micimize/angel-starwars-test-server
 
 dependencies:
   #angel_file_service: ^1.0.0
@@ -30,7 +30,7 @@ dev_dependencies:
 dependency_overrides:
   graphql_server: 
     git:
-      url: git://github.com/micimize/graphql.git
+      url: git://github.com/micimize/angel-starwars-test-server.git
       ref: introspective-cycles
       path: graphql_server
 
