@@ -10,18 +10,18 @@ dependencies:
   #collection: ^1.14.12
   async: ^2.2.0
   args: ^1.5.1
-  angel_graphql: ^1.0.0
-  graphql_schema: ^1.0.4
-  graphql_server: ^1.0.3
-
-  graphql_parser: ^1.1.4
-  angel_framework: ^2.0.1
-  angel_typed_service: ^1.0.1
-  angel_http_exception: ^1.0.1
-  angel_model: ^1.0.0
-  angel_serialize: ^2.0.0
   logging: ^0.11.3
   io: ^0.3.2
+
+  angel_graphql: 1.0.0
+  graphql_schema: 1.0.4
+  graphql_server: 1.0.3
+  graphql_parser: 1.1.4
+  angel_framework: 2.0.1
+  angel_typed_service: 1.0.1
+  angel_http_exception: 1.0.1
+  angel_model: 1.0.0
+  angel_serialize: 2.0.0
   angel_container: 1.1.0
 
 dev_dependencies:

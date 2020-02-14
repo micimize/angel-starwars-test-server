@@ -17,3 +17,4 @@ analyzer:
     implicit_dynamic_function: warning
     implicit_dynamic_parameter: warning
     implicit_dynamic_type: warning
+    implicit_dynamic_method: warning

@@ -97,8 +97,8 @@ Future configureServer(
             description: 'which page to get from the api',
           )
         ],
-        resolve: (_, inputs) {
-          return {
+        resolve: (dynamic _, inputs) {
+          return <String, Object>{
             'page': inputs['page'],
             'reviews': directory.pageAsJson(inputs['page'] as int),
           };
@@ -211,8 +211,8 @@ Future configureServer(
   // TODO replace MapService with a relational cache from graphql/client
   // we're inlining relations here for now
 
-  Map<String, dynamic> starshipMap = {};
-  Map<String, dynamic> friendMap = {};
+  Map<String, Object> starshipMap = {};
+  Map<String, Object> friendMap = {};
 
   for (final friend in [...data['humans'], ...data['droids']]) {
     friendMap[friend['id'] as String] = friend;
@@ -224,7 +224,7 @@ Future configureServer(
   }
 
   List<dynamic> denormalize(dynamic ids, Map<String, dynamic> relation) =>
-      ((ids ?? const []) as List)
+      ((ids ?? const <String>[]) as List)
           .cast<String>()
           .map((String id) => relation[id])
           .toList();
@@ -244,7 +244,7 @@ Future configureServer(
 GraphQLFieldResolver randomHeroResolver(
     Service droidService, Service humansService, Random rnd) {
   return (_, args) async {
-    var allHeroes = [];
+    var allHeroes = <dynamic>[];
     Iterable allDroids = await droidService.index();
     Iterable allHumans = await humansService.index();
     allHeroes..addAll(allDroids)..addAll(allHumans);
