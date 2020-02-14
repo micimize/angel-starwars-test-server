@@ -177,18 +177,16 @@ Future configureServer(
 
   // Next, create a GraphQL object, which will be passed to `graphQLHttp`, and
   // used to mount a spec-compliant GraphQL endpoint on the server.
-  var graphQL = GraphQL(
-    schema,
-    introspect: true,
-    customTypes: [
-      episodeGraphQLType,
-      starshipGraphQLType,
-      droidGraphQLType,
-      humanGraphQLType,
-      reviewGraphQLType,
-    ],
-    defaultFieldResolver: mirrorsFieldResolver
-  );
+  var graphQL = GraphQL(schema,
+      introspect: true,
+      customTypes: [
+        episodeGraphQLType,
+        starshipGraphQLType,
+        droidGraphQLType,
+        humanGraphQLType,
+        reviewGraphQLType,
+      ],
+      defaultFieldResolver: mirrorsFieldResolver);
 
   // Mount the GraphQL endpoint.
   app.all('/graphql', graphQLHttp(graphQL));

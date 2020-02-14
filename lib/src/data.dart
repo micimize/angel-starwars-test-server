@@ -38,7 +38,7 @@ final data = {
       "homePlanet": "Alderaan",
       "height": 1.5,
       "mass": 49.0,
-      "starships": []
+      "starships": <void>[]
     },
     {
       "id": "1004",
@@ -47,14 +47,14 @@ final data = {
       "appearsIn": ["NEWHOPE"],
       "height": 1.8,
       "mass": null,
-      "starships": []
+      "starships": <void>[]
     }
   ],
   "droids": [
     {
       "id": "2000",
       "name": "C-3PO",
-      "friends": [ /*"1000", "1002",*/ "1003", "2001"],
+      "friends": [/*"1000", "1002",*/ "1003", "2001"],
       "appearsIn": ["NEWHOPE", "EMPIRE", "JEDI"],
       "primaryFunction": "Protocol"
     },

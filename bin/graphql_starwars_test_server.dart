@@ -15,9 +15,9 @@ final parser = ArgParser()
   ..addOption('host', defaultsTo: '127.0.0.1')
   ..addOption('port', defaultsTo: '3000');
 
-main(List<String> args) async {
+void main(List<String> args) async {
   final arguments = parser.parse(args);
-  final host = arguments['host'];
+  final host = arguments['host'] as String;
   final port = int.parse(arguments['port'] as String);
 
   Future<Angel> createServer() async {

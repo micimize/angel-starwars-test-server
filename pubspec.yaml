@@ -12,7 +12,8 @@ dependencies:
   args: ^1.5.1
   angel_graphql: ^1.0.0
   graphql_schema: ^1.0.4
-  graphql_server: ^1.0.2
+  graphql_server: ^1.0.3
+
   graphql_parser: ^1.1.4
   angel_framework: ^2.0.1
   angel_typed_service: ^1.0.1
@@ -27,17 +28,10 @@ dev_dependencies:
   angel_serialize_generator: ^2.0.0
   graphql_generator: ^1.0.0
   build_runner: ^1.0.0
-
-dependency_overrides:
-  graphql_server: 
-    git:
-      url: git://github.com/micimize/angel-starwars-test-server.git
-      ref: introspective-cycles
-      path: graphql_server
+  pedantic: ^1.8.0
 
 environment:
-  sdk: '>=2.2.0 <3.0.0'
+  sdk: ">=2.2.0 <3.0.0"
 
 executables:
   serve: graphql_starwars_test_server
-

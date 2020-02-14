@@ -15,7 +15,7 @@ class Starship extends _Starship {
       @required List<double> coordinates,
       this.createdAt,
       this.updatedAt})
-      : this.coordinates = List.unmodifiable(coordinates ?? []);
+      : this.coordinates = List.unmodifiable(coordinates ?? <double>[]);
 
   @override
   final String id;
@@ -51,7 +51,7 @@ class Starship extends _Starship {
         updatedAt: updatedAt ?? this.updatedAt);
   }
 
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     return other is _Starship &&
         other.id == id &&
         other.name == name &&
@@ -64,7 +64,8 @@ class Starship extends _Starship {
 
   @override
   int get hashCode {
-    return hashObjects([id, name, length, coordinates, createdAt, updatedAt]);
+    return hashObjects(
+        <Object>[id, name, length, coordinates, createdAt, updatedAt]);
   }
 
   @override
@@ -87,8 +88,8 @@ class Droid extends _Droid {
       this.primaryFunction,
       this.createdAt,
       this.updatedAt})
-      : this.friends = List.unmodifiable(friends ?? []),
-        this.appearsIn = List.unmodifiable(appearsIn ?? []);
+      : this.friends = List.unmodifiable(friends ?? <Character>[]),
+        this.appearsIn = List.unmodifiable(appearsIn ?? <Episode>[]);
 
   @override
   final String id;
@@ -129,7 +130,7 @@ class Droid extends _Droid {
         updatedAt: updatedAt ?? this.updatedAt);
   }
 
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     return other is _Droid &&
         other.id == id &&
         other.name == name &&
@@ -144,8 +145,15 @@ class Droid extends _Droid {
 
   @override
   int get hashCode {
-    return hashObjects(
-        [id, name, friends, appearsIn, primaryFunction, createdAt, updatedAt]);
+    return hashObjects(<Object>[
+      id,
+      name,
+      friends,
+      appearsIn,
+      primaryFunction,
+      createdAt,
+      updatedAt
+    ]);
   }
 
   @override
@@ -171,9 +179,9 @@ class Human extends _Human {
       List<Starship> starships,
       this.createdAt,
       this.updatedAt})
-      : this.appearsIn = List.unmodifiable(appearsIn ?? []),
-        this.friends = List.unmodifiable(friends ?? []),
-        this.starships = List.unmodifiable(starships ?? []);
+      : this.appearsIn = List.unmodifiable(appearsIn ?? <Episode>[]),
+        this.friends = List.unmodifiable(friends ?? <Character>[]),
+        this.starships = List.unmodifiable(starships ?? <Starship>[]);
 
   @override
   final String id;
@@ -229,7 +237,7 @@ class Human extends _Human {
         updatedAt: updatedAt ?? this.updatedAt);
   }
 
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     return other is _Human &&
         other.id == id &&
         other.name == name &&
@@ -248,7 +256,7 @@ class Human extends _Human {
 
   @override
   int get hashCode {
-    return hashObjects([
+    return hashObjects(<Object>[
       id,
       name,
       appearsIn,
@@ -348,7 +356,7 @@ class StarshipSerializer extends Codec<Starship, Map> {
           "Missing required field 'coordinates' on Starship.");
     }
 
-    return {
+    return <String, Object>{
       'id': model.id,
       'name': model.name,
       'coordinates': model.coordinates,
@@ -452,7 +460,7 @@ class DroidSerializer extends Codec<Droid, Map> {
       throw FormatException("Missing required field 'appearsIn' on Droid.");
     }
 
-    return {
+    return <String, Object>{
       'id': model.id,
       'name': model.name,
       'friends': model.friends,
@@ -577,7 +585,7 @@ class HumanSerializer extends Codec<Human, Map> {
       throw FormatException("Missing required field 'height' on Human.");
     }
 
-    return {
+    return <String, Object>{
       'id': model.id,
       'name': model.name,
       'appearsIn': model.appearsIn,
@@ -671,7 +679,8 @@ class Review extends _Review {
         updatedAt: updatedAt ?? this.updatedAt);
   }
 
-  bool operator ==(other) {
+  @override
+  bool operator ==(Object other) {
     return other is _Review &&
         other.id == id &&
         other.episode == episode &&
@@ -683,7 +692,8 @@ class Review extends _Review {
 
   @override
   int get hashCode {
-    return hashObjects([id, episode, stars, commentary, createdAt, updatedAt]);
+    return hashObjects(
+        <Object>[id, episode, stars, commentary, createdAt, updatedAt]);
   }
 
   @override
@@ -765,7 +775,7 @@ class ReviewSerializer extends Codec<Review, Map> {
       throw FormatException("Missing required field 'stars' on Review.");
     }
 
-    return {
+    return <String, Object>{
       'id': model.id,
       'episode': model.episode == null ? null : episodeToJson(model.episode),
       'stars': model.stars,

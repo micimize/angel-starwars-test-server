@@ -146,20 +146,20 @@ class SelfRefObjectType extends GraphQLObjectType {
       description: description ?? this.description,
       source: this,
       getInputFields: (source, self) => fields.map((f) {
-            return f.type == source
-                ? self as GraphQLInputObjectField
-                : f.type is GraphQLListType &&
-                        (f.type as GraphQLListType).ofType == source
-                    ? GraphQLInputObjectField(
-                        f.name,
-                        GraphQLListType(self),
-                      )
-                    : GraphQLInputObjectField(
-                        f.name,
-                        f.type.coerceToInputObject(),
-                        description: f.description,
-                      );
-          }),
+        return f.type == source
+            ? self as GraphQLInputObjectField
+            : f.type is GraphQLListType &&
+                    (f.type as GraphQLListType).ofType == source
+                ? GraphQLInputObjectField<dynamic, dynamic>(
+                    f.name,
+                    GraphQLListType(self),
+                  )
+                : GraphQLInputObjectField<dynamic, dynamic>(
+                    f.name,
+                    f.type.coerceToInputObject(),
+                    description: f.description,
+                  );
+      }),
     );
   }
 }
@@ -169,18 +169,20 @@ GraphQLObjectType characterGraphQLType = SelfRefObjectType(
   isInterface: true,
   interfaces: [],
   getFields: (self) => [
-        field('id', graphQLString, description: 'The ID of the character'),
-        field('name', graphQLString, description: 'The name of the character'),
-        field('friends', listOf(self),
-            description:
-                'The friends of the character, or an empty list if they have none'),
-        field(
-          'appearsIn',
-          listOf(episodeGraphQLType),
-          description: 'The movies this character appears in',
-        ),
-        field('graphql', graphQLString)
-      ],
+    field<String, String>('id', graphQLString,
+        description: 'The ID of the character'),
+    field<String, String>('name', graphQLString,
+        description: 'The name of the character'),
+    field<dynamic, dynamic>('friends', listOf(self),
+        description:
+            'The friends of the character, or an empty list if they have none'),
+    field<dynamic, dynamic>(
+      'appearsIn',
+      listOf(episodeGraphQLType),
+      description: 'The movies this character appears in',
+    ),
+    field<dynamic, dynamic>('graphql', graphQLString)
+  ],
 );
 
 // @serializable
