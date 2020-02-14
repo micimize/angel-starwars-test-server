@@ -21,6 +21,7 @@ dependencies:
   angel_serialize: ^2.0.0
   logging: ^0.11.3
   io: ^0.3.2
+  angel_container: 1.1.0
 
 dev_dependencies:
   angel_serialize_generator: ^2.0.0
