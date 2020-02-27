@@ -36,3 +36,5 @@ subscription reviewAdded {
 ```
 
 The server will generate a fake review for testing streams every 10 seconds, unless the env variable `GENERATE_REVIEWS=false`
+
+`schema.graphql` generated with `get-graphql-schema http://127.0.0.1:3000/graphql > schema.graphql`
