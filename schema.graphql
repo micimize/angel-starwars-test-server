@@ -54,9 +54,6 @@ enum Episode {
   JEDI
 }
 
-"""Droid | Human"""
-union Hero = Droid | Human
-
 type Human implements Character {
   id: String
   name: String
@@ -118,6 +115,9 @@ type ReviewResults {
   reviews: [Review!]
 }
 
+"""Droid | Human | Starship"""
+union SearchResult = Droid | Human | Starship
+
 type Starship {
   id: String
   name: String
@@ -163,7 +163,10 @@ type StarWarsQuery {
   starships: [Starship!]
 
   """Finds a random hero within the known galaxy, whether a Droid or Human."""
-  hero(ep: Episode): Hero
+  hero(ep: Episode): Character
+
+  """Finds a random starship, droid, or human"""
+  randomEntity: SearchResult
   reviews(
     """which page to get from the api"""
     page: Int = 0

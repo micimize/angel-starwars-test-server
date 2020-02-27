@@ -31,9 +31,13 @@ Future configureServer(
 
   final rnd = Random();
 
-  // A Hero can be either a Droid or Human; create a union type that represents this.
-  final heroType =
-      GraphQLUnionType('Hero', [droidGraphQLType, humanGraphQLType]);
+  // ~~A Hero can be either a Droid or Human; create a union type that represents this.~~
+  // ~~final heroType = GraphQLUnionType('Hero', [droidGraphQLType, humanGraphQLType]);~~
+  // A Hero can be any Character type
+  final heroType = characterGraphQLType;
+
+  final searchType = GraphQLUnionType('SearchResult',
+      [droidGraphQLType, humanGraphQLType, starshipGraphQLType]);
 
   // Create the query type.
   //
@@ -69,7 +73,14 @@ Future configureServer(
         inputs: [
           GraphQLFieldInput('ep', episodeGraphQLType),
         ],
-        resolve: randomHeroResolver(droidService, humansService, rnd),
+        resolve: randomServiceResolver([droidService, humansService], rnd),
+      ),
+      field(
+        'randomEntity',
+        searchType,
+        description: 'Finds a random starship, droid, or human',
+        resolve: randomServiceResolver(
+            [droidService, humansService, starshipService], rnd),
       ),
       field(
         'reviews',
@@ -241,22 +252,15 @@ Future configureServer(
   }
 }
 
-GraphQLFieldResolver randomHeroResolver(
-    Service droidService, Service humansService, Random rnd) {
+GraphQLFieldResolver randomServiceResolver(List<Service> services, Random rnd) {
   return (_, args) async {
-    var allHeroes = <dynamic>[];
-    Iterable allDroids = await droidService.index();
-    Iterable allHumans = await humansService.index();
-    allHeroes..addAll(allDroids)..addAll(allHumans);
-
-    // Ignore the annoying cast here, hopefully Dart 2 fixes cases like this
-    allHeroes = allHeroes
-        .where((m) =>
-            !args.containsKey('ep') ||
-            (m['appears_in'].contains(args['ep']) as bool))
+    var allOptions = (await Future.wait(services.map((s) => s.index())))
+        .expand((options) => options)
         .toList();
 
-    return allHeroes.isEmpty ? null : allHeroes[rnd.nextInt(allHeroes.length)];
+    return allOptions.isEmpty
+        ? null
+        : allOptions[rnd.nextInt(allOptions.length)];
   };
 }
 
