@@ -11,20 +11,39 @@ import 'package:graphql_starwars_test_server/src/pretty_logging.dart'
 import 'package:graphql_starwars_test_server/graphql_starwars_test_server.dart'
     as star_wars;
 
+bool parseBool(dynamic arg) {
+  final b = (arg as String).toLowerCase();
+  return b.startsWith('t') || b.startsWith('1');
+}
+
 final parser = ArgParser()
   ..addOption('host', defaultsTo: '127.0.0.1')
-  ..addOption('port', defaultsTo: '3000');
+  ..addOption('port', defaultsTo: '3000')
+  ..addOption('enableCors', defaultsTo: 'true')
+  ..addOption('generateReviews', defaultsTo: 'true');
 
 void main(List<String> args) async {
   final arguments = parser.parse(args);
   final host = arguments['host'] as String;
   final port = int.parse(arguments['port'] as String);
 
+  final enableCors = parseBool(arguments['enableCors']);
+
+  final generateReviews = parseBool(arguments['generateReviews']);
+
+  print(
+    "CORS: ${enableCors ? 'enabled' : 'disabled'}\n"
+    "Review Generation: ${generateReviews ? 'enabled' : 'disabled'}",
+  );
+
   Future<Angel> createServer() async {
     Angel app = Angel(reflector: MirrorsReflector());
     app.logger = Logger('star_wars')..onRecord.listen(prettyLog);
     await app.configure(
-      star_wars.configureServer,
+      star_wars.serverConfigurer(
+        enableCors: enableCors,
+        generateReviews: generateReviews,
+      ),
     );
     return app;
   }
