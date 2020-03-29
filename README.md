@@ -5,6 +5,7 @@ The server is heavily limited:
 
 - recursive relationships aren't entirely supported
 - a lot of mutations seem broken
+- we [can't test subscriptions in graphiql](https://github.com/angel-dart/angel/issues/250) atm
 
 To run, add as a dependency and
 

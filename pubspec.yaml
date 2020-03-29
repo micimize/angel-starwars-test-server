@@ -1,33 +1,35 @@
 name: graphql_starwars_test_server
 description: A stand-alone GraphQL test server built with angel dart.
   Adapted from [example_star_wars](https://github.com/angel-dart/graphql/tree/master/example_star_wars)
-version: 0.1.0
+version: 0.2.0-alpha
 publisher: Michael Joseph Rosenthal <rosenthalm93@gmail.com>
 homepage: https://github.com/micimize/angel-starwars-test-server
 
 dependencies:
-  #angel_file_service: ^1.0.0
-  #collection: ^1.14.12
   async: ^2.2.0
   args: ^1.5.1
   logging: ^0.11.3
   io: ^0.3.2
-
-  angel_container: ^1.1.0
-  angel_framework: ^2.1.1
-  angel_graphql: ^1.0.0
-  angel_http_exception: ^1.0.1
-  angel_model: ^1.0.3
+  angel_graphql: ^2.0.0-beta
+  angel_hot: ^2.0.6
   angel_serialize: ^2.2.3+3
-  angel_typed_service: ^1.0.1
-  graphql_parser: ^1.1.4
-  graphql_schema: ^1.0.4
-  graphql_server: ^1.0.3
   angel_cors: ^2.0.0
+  angel_typed_service: ^1.0.1
+
+  graphql_server:
+    git:
+      url: git@github.com:micimize/angel.git
+      ref: typeerror2.8-fix
+      path: packages/graphql/graphql_server
+
+  graphql_parser:
+    git:
+      url: git@github.com:micimize/angel.git
+      path: packages/graphql/graphql_parser
 
 dev_dependencies:
-  angel_serialize_generator: ^2.0.0
-  graphql_generator: ^1.0.0
+  #angel_serialize_generator: ^2.0.0
+  #graphql_generator: ^1.0.0
   build_runner: ^1.0.0
   pedantic: ^1.8.0
 
@@ -36,3 +38,15 @@ environment:
 
 executables:
   serve: graphql_starwars_test_server
+
+# dependency_overrides:
+#   graphql_server:
+#     git:
+#       url: git@github.com:micimize/angel.git
+#       ref: typeerror2.8-fix
+#       path: packages/graphql/graphql_server
+#   graphql_parser:
+#     git:
+#       url: git@github.com:micimize/angel.git
+#       path: packages/graphql/graphql_parser
+

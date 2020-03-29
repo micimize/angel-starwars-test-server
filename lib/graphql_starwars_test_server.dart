@@ -228,8 +228,8 @@ AngelConfigurer serverConfigurer({
         app.get(
             '/graphiql',
             graphiQL(
-              subscriptionsEndpoint: 'ws://localhost:3000/subscriptions',
-            ));
+                //subscriptionsEndpoint: 'ws://localhost:3000/subscriptions',
+                ));
       }
 
       // TODO replace MapService with a relational cache from graphql/client
